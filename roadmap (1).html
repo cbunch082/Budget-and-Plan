@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Life Roadmap</title>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence }
+    from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc }
+    from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBx-Vf9VNiRkYDPGrME6r21orHt43-X7dQ",
+    authDomain: "dashboard-25c32.firebaseapp.com",
+    projectId: "dashboard-25c32",
+    storageBucket: "dashboard-25c32.firebasestorage.app",
+    messagingSenderId: "978724068740",
+    appId: "1:978724068740:web:a7aa6e866358c75b5791d1"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  window.firebaseApp = app;
+
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  setPersistence(auth, browserLocalPersistence).catch(()=>{});
+
+  window.fb = {
+    auth, db,
+    onAuthChange: (cb) => onAuthStateChanged(auth, cb),
+    signIn: (email, password) => signInWithEmailAndPassword(auth, email, password),
+    signOut: () => signOut(auth),
+    loadDoc: async (path) => {
+      const ref = doc(db, path);
+      const snap = await getDoc(ref);
+      return snap.exists() ? snap.data() : null;
+    },
+    saveDoc: async (path, data) => {
+      await setDoc(doc(db, path), data);
+    }
+  };
+  window.dispatchEvent(new Event('firebase-ready'));
+</script>
+<style>
+/* ── Themes ── */
+[data-theme="halloween"] {
+  --bg-page: #0d0a0e;
+  --bg-primary: #1a0f1e;
+  --bg-secondary: #241528;
+  --bg-tertiary: #2e1a35;
+  --accent: #f97316;
+  --accent-dark: #ea580c;
+  --accent-pale: #1c1008;
+  --text: #f5e6d0;
+  --text-s: #c4a882;
+  --border: rgba(249,115,22,0.2);
+  --border-m: rgba(249,115,22,0.38);
+  --green: #84cc16;
+  --green-bg: #0f1a02;
+  --blue: #a78bfa;
+  --blue-bg: #1a0f2e;
+  --amber: #fb923c;
+  --amber-bg: #1c0f04;
+  --pink: #f472b6;
+  --pink-bg: #1e0a18;
+  --teal: #2dd4bf;
+  --teal-bg: #031a18;
+  --tab-active: #f97316;
+  --pill-home-bg: #2e1a08; --pill-home-t: #fb923c; --pill-home-b: #7c3a0a;
+  --pill-health-bg: #0e1e02; --pill-health-t: #a3e635; --pill-health-b: #365314;
+  --pill-study-bg: #1a0f2e; --pill-study-t: #c4b5fd; --pill-study-b: #4c1d95;
+  --pill-family-bg: #1e0a18; --pill-family-t: #f9a8d4; --pill-family-b: #831843;
+  --pill-travel-bg: #0e1e1e; --pill-travel-t: #5eead4; --pill-travel-b: #134e4a;
+  --pill-finance-bg: #1e0808; --pill-finance-t: #fca5a5; --pill-finance-b: #7f1d1d;
+  --pill-yard-bg: #021e18; --pill-yard-t: #6ee7b7; --pill-yard-b: #064e3b;
+  --shadow: 0 2px 16px rgba(249,115,22,0.12);
+  --check: #f97316;
+  --stripe: repeating-linear-gradient(135deg, transparent, transparent 10px, rgba(249,115,22,0.03) 10px, rgba(249,115,22,0.03) 20px);
+}
+[data-theme="forest"] {
+  --bg-page: #f0f7f0;
+  --bg-primary: #ffffff;
+  --bg-secondary: #e8f5e8;
+  --bg-tertiary: #d4edcc;
+  --accent: #2d7a3a;
+  --accent-dark: #1e5c28;
+  --accent-pale: #edf7ed;
+  --text: #1a2e1c;
+  --text-s: #4a6b4e;
+  --border: rgba(45,122,58,0.15);
+  --border-m: rgba(45,122,58,0.3);
+  --green: #2d7a3a; --green-bg: #edf7ed;
+  --blue: #1a6b8a; --blue-bg: #e0f4f8;
+  --amber: #8a6a1a; --amber-bg: #fdf6e0;
+  --pink: #8a3a6b; --pink-bg: #f8e0f0;
+  --teal: #1a8a7a; --teal-bg: #e0f8f4;
+  --tab-active: #2d7a3a;
+  --pill-home-bg: #fdf6e0; --pill-home-t: #7c5a0a; --pill-home-b: #d4a020;
+  --pill-health-bg: #edf7ed; --pill-health-t: #1e5c28; --pill-health-b: #4a9a54;
+  --pill-study-bg: #e0f4f8; --pill-study-t: #0a4a6b; --pill-study-b: #2a8aaa;
+  --pill-family-bg: #f8e0f0; --pill-family-t: #6b1a4a; --pill-family-b: #aa3a8a;
+  --pill-travel-bg: #e0f8f4; --pill-travel-t: #0a4a40; --pill-travel-b: #2a8a7a;
+  --pill-finance-bg: #fde8e8; --pill-finance-t: #7c1a1a; --pill-finance-b: #c44040;
+  --pill-yard-bg: #edf7ed; --pill-yard-t: #1e5c28; --pill-yard-b: #4a9a54;
+  --shadow: 0 2px 12px rgba(45,122,58,0.1);
+  --check: #2d7a3a;
+  --stripe: none;
+}
+[data-theme="ocean"] {
+  --bg-page: #e8f4fd;
+  --bg-primary: #ffffff;
+  --bg-secondary: #daeefb;
+  --bg-tertiary: #c8e4f8;
+  --accent: #0369a1;
+  --accent-dark: #024f7c;
+  --accent-pale: #e0f2fe;
+  --text: #0c2340;
+  --text-s: #2a5a7a;
+  --border: rgba(3,105,161,0.15);
+  --border-m: rgba(3,105,161,0.3);
+  --green: #0d7a5a; --green-bg: #e0f5ee;
+  --blue: #0369a1; --blue-bg: #e0f2fe;
+  --amber: #8a5a0a; --amber-bg: #fdf0d8;
+  --pink: #7a2a6a; --pink-bg: #f5e0f2;
+  --teal: #0d7a6a; --teal-bg: #e0f5f0;
+  --tab-active: #0369a1;
+  --pill-home-bg: #fdf0d8; --pill-home-t: #6a4008; --pill-home-b: #c4900a;
+  --pill-health-bg: #e0f5ee; --pill-health-t: #084a38; --pill-health-b: #2a9a74;
+  --pill-study-bg: #e0f2fe; --pill-study-t: #024f7c; --pill-study-b: #0a8ad4;
+  --pill-family-bg: #f5e0f2; --pill-family-t: #5a1a50; --pill-family-b: #a43a8a;
+  --pill-travel-bg: #e0f5f0; --pill-travel-t: #083a34; --pill-travel-b: #1a8a78;
+  --pill-finance-bg: #fde8e8; --pill-finance-t: #6a1818; --pill-finance-b: #c44040;
+  --pill-yard-bg: #e0f5ee; --pill-yard-t: #084a38; --pill-yard-b: #2a9a74;
+  --shadow: 0 2px 12px rgba(3,105,161,0.1);
+  --check: #0369a1;
+  --stripe: none;
+}
+[data-theme="sunset"] {
+  --bg-page: #fff8f0;
+  --bg-primary: #ffffff;
+  --bg-secondary: #fef0e4;
+  --bg-tertiary: #fde4cc;
+  --accent: #c2410c;
+  --accent-dark: #9a3409;
+  --accent-pale: #fff4ed;
+  --text: #2d1206;
+  --text-s: #7c3a18;
+  --border: rgba(194,65,12,0.15);
+  --border-m: rgba(194,65,12,0.3);
+  --green: #5a7a1a; --green-bg: #f0f8e0;
+  --blue: #1a4a8a; --blue-bg: #e0ecf8;
+  --amber: #b45309; --amber-bg: #fef3e0;
+  --pink: #be185d; --pink-bg: #fde8f0;
+  --teal: #0f766e; --teal-bg: #e0f5f2;
+  --tab-active: #c2410c;
+  --pill-home-bg: #fef3e0; --pill-home-t: #7c3a08; --pill-home-b: #c47a1a;
+  --pill-health-bg: #f0f8e0; --pill-health-t: #3a5a08; --pill-health-b: #7aaa2a;
+  --pill-study-bg: #e0ecf8; --pill-study-t: #0a2a6a; --pill-study-b: #2a5aaa;
+  --pill-family-bg: #fde8f0; --pill-family-t: #7a0a3a; --pill-family-b: #c43a7a;
+  --pill-travel-bg: #e0f5f2; --pill-travel-t: #083a34; --pill-travel-b: #1a8a78;
+  --pill-finance-bg: #fde8e8; --pill-finance-t: #6a1818; --pill-finance-b: #c44040;
+  --pill-yard-bg: #e0f5ee; --pill-yard-t: #083a28; --pill-yard-b: #2a8a58;
+  --shadow: 0 2px 12px rgba(194,65,12,0.1);
+  --check: #c2410c;
+  --stripe: none;
+}
+[data-theme="lavender"] {
+  --bg-page: #f5f0ff;
+  --bg-primary: #ffffff;
+  --bg-secondary: #ede8ff;
+  --bg-tertiary: #e0d8ff;
+  --accent: #7c3aed;
+  --accent-dark: #6020c0;
+  --accent-pale: #f3f0ff;
+  --text: #1e1040;
+  --text-s: #5a3a8a;
+  --border: rgba(124,58,237,0.15);
+  --border-m: rgba(124,58,237,0.3);
+  --green: #2d7a5a; --green-bg: #e8f7ee;
+  --blue: #2a5aaa; --blue-bg: #e8eef8;
+  --amber: #8a5a1a; --amber-bg: #fdf4e0;
+  --pink: #be3a8a; --pink-bg: #fde8f4;
+  --teal: #1a7a7a; --teal-bg: #e0f4f4;
+  --tab-active: #7c3aed;
+  --pill-home-bg: #fdf4e0; --pill-home-t: #5a3808; --pill-home-b: #aa7820;
+  --pill-health-bg: #e8f7ee; --pill-health-t: #0e4a30; --pill-health-b: #3a9a6a;
+  --pill-study-bg: #ede8ff; --pill-study-t: #3a1a7a; --pill-study-b: #7a4acf;
+  --pill-family-bg: #fde8f4; --pill-family-t: #7a1a50; --pill-family-b: #c43a8a;
+  --pill-travel-bg: #e0f4f4; --pill-travel-t: #083a3a; --pill-travel-b: #2a8a8a;
+  --pill-finance-bg: #fde8e8; --pill-finance-t: #6a1818; --pill-finance-b: #c44040;
+  --pill-yard-bg: #e8f7ee; --pill-yard-t: #0e4a30; --pill-yard-b: #3a9a6a;
+  --shadow: 0 2px 12px rgba(124,58,237,0.1);
+  --check: #7c3aed;
+  --stripe: none;
+}
+[data-theme="christmas"] {
+  --bg-page: #f0faf2;
+  --bg-primary: #ffffff;
+  --bg-secondary: #e4f5e8;
+  --bg-tertiary: #ccebd4;
+  --accent: #c0392b;
+  --accent-dark: #96281b;
+  --accent-pale: #fdecea;
+  --text: #0f2415;
+  --text-s: #2e6b40;
+  --border: rgba(192,57,43,0.15);
+  --border-m: rgba(192,57,43,0.3);
+  --green: #1a7a3a; --green-bg: #e4f5e8;
+  --blue: #1a4a8a; --blue-bg: #dce8f8;
+  --amber: #c47a10; --amber-bg: #fef4dd;
+  --pink: #b03060; --pink-bg: #fce8ef;
+  --teal: #0f6a5a; --teal-bg: #dcf0ec;
+  --tab-active: #c0392b;
+  --pill-home-bg: #fdecea; --pill-home-t: #7a1a10; --pill-home-b: #c0392b;
+  --pill-health-bg: #e4f5e8; --pill-health-t: #0f4a22; --pill-health-b: #2a8a48;
+  --pill-study-bg: #dce8f8; --pill-study-t: #0a2a6a; --pill-study-b: #2a5aaa;
+  --pill-family-bg: #fce8ef; --pill-family-t: #6a1030; --pill-family-b: #b03060;
+  --pill-travel-bg: #dcf0ec; --pill-travel-t: #083a30; --pill-travel-b: #1a7a60;
+  --pill-finance-bg: #fff8e0; --pill-finance-t: #6a4a00; --pill-finance-b: #c4900a;
+  --pill-yard-bg: #e4f5e8; --pill-yard-t: #0f4a22; --pill-yard-b: #2a8a48;
+  --shadow: 0 2px 12px rgba(192,57,43,0.1);
+  --check: #c0392b;
+  --stripe: repeating-linear-gradient(135deg, transparent, transparent 14px, rgba(192,57,43,0.03) 14px, rgba(192,57,43,0.03) 28px);
+}
+[data-theme="fall"] {
+  --bg-page: #fdf6ed;
+  --bg-primary: #ffffff;
+  --bg-secondary: #faeedd;
+  --bg-tertiary: #f5e0c0;
+  --accent: #b45309;
+  --accent-dark: #8a3d04;
+  --accent-pale: #fef3e0;
+  --text: #2a1600;
+  --text-s: #7a4a18;
+  --border: rgba(180,83,9,0.15);
+  --border-m: rgba(180,83,9,0.3);
+  --green: #4a7a1a; --green-bg: #eef5e0;
+  --blue: #2a508a; --blue-bg: #e0e8f5;
+  --amber: #b45309; --amber-bg: #fef3e0;
+  --pink: #a03060; --pink-bg: #fce8f0;
+  --teal: #1a6a5a; --teal-bg: #e0f0ec;
+  --tab-active: #b45309;
+  --pill-home-bg: #fef3e0; --pill-home-t: #6a3000; --pill-home-b: #c47820;
+  --pill-health-bg: #eef5e0; --pill-health-t: #2a4a08; --pill-health-b: #6aaa28;
+  --pill-study-bg: #e0e8f5; --pill-study-t: #0a2a6a; --pill-study-b: #3a68c0;
+  --pill-family-bg: #fce8f0; --pill-family-t: #6a1030; --pill-family-b: #c04080;
+  --pill-travel-bg: #fdecea; --pill-travel-t: #6a1808; --pill-travel-b: #c03820;
+  --pill-finance-bg: #f5e0c0; --pill-finance-t: #4a2800; --pill-finance-b: #aa6818;
+  --pill-yard-bg: #eef5e0; --pill-yard-t: #2a4a08; --pill-yard-b: #6aaa28;
+  --shadow: 0 2px 12px rgba(180,83,9,0.1);
+  --check: #b45309;
+  --stripe: repeating-linear-gradient(160deg, transparent, transparent 18px, rgba(180,83,9,0.04) 18px, rgba(180,83,9,0.04) 36px);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: var(--text); background: var(--bg-page); min-height: 100vh; background-image: var(--stripe); transition: background 0.3s, color 0.3s; }
+.app { max-width: 820px; margin: 0 auto; padding: 0 0 4rem; }
+
+/* Header */
+.header { background: var(--bg-primary); border-bottom: 1px solid var(--border-m); padding: 1.25rem; }
+.header-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.header h1 { font-size: 22px; font-weight: 700; color: var(--accent); margin-bottom: 2px; }
+.header p { font-size: 12px; color: var(--text-s); }
+.theme-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+.theme-label { font-size: 11px; color: var(--text-s); font-weight: 500; }
+.theme-btn { width: 22px; height: 22px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; transition: transform 0.15s, border-color 0.15s; }
+.theme-btn:hover { transform: scale(1.15); }
+.theme-btn.active { border-color: var(--text); transform: scale(1.15); }
+.save-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-s); margin-top: 6px; }
+
+/* Stats bar */
+.stats-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; padding: 1rem 1.25rem; background: var(--bg-secondary); border-bottom: 1px solid var(--border); }
+.stat { text-align: center; }
+.stat-val { font-size: 20px; font-weight: 700; color: var(--accent); }
+.stat-label { font-size: 10px; color: var(--text-s); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
+
+/* Tabs */
+.tabs { display: flex; border-bottom: 1px solid var(--border); background: var(--bg-primary); flex-wrap: wrap; }
+.tab { padding: 10px 16px; font-size: 13px; background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; color: var(--text-s); margin-bottom: -1px; font-family: inherit; font-weight: 500; white-space: nowrap; }
+.tab:hover { color: var(--accent); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.content { padding: 1.25rem; }
+.panel { display: none; } .panel.active { display: block; }
+
+/* Month sections */
+.month-section { margin-bottom: 2rem; }
+.month-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 8px; }
+.month-title { font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.month-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.add-item-btn { font-size: 11px; color: var(--text-s); background: var(--bg-secondary); border: 1px dashed var(--border-m); border-radius: 20px; padding: 4px 12px; cursor: pointer; font-family: inherit; }
+.add-item-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+/* Week blocks */
+.week-block { margin-bottom: 1rem; padding: 12px 14px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 12px; }
+.week-label { font-size: 11px; font-weight: 600; color: var(--text-s); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
+.pill-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.pill { font-size: 12px; padding: 5px 12px; border-radius: 20px; font-weight: 500; border: 1px solid transparent; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: opacity 0.2s; user-select: none; }
+.pill.checked { opacity: 0.45; text-decoration: line-through; }
+.pill-check { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid currentColor; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 9px; }
+.pill.checked .pill-check { background: var(--check); border-color: var(--check); color: white; }
+.pill-home { background: var(--pill-home-bg); color: var(--pill-home-t); border-color: var(--pill-home-b); }
+.pill-health { background: var(--pill-health-bg); color: var(--pill-health-t); border-color: var(--pill-health-b); }
+.pill-study { background: var(--pill-study-bg); color: var(--pill-study-t); border-color: var(--pill-study-b); }
+.pill-family { background: var(--pill-family-bg); color: var(--pill-family-t); border-color: var(--pill-family-b); }
+.pill-travel { background: var(--pill-travel-bg); color: var(--pill-travel-t); border-color: var(--pill-travel-b); }
+.pill-finance { background: var(--pill-finance-bg); color: var(--pill-finance-t); border-color: var(--pill-finance-b); }
+.pill-yard { background: var(--pill-yard-bg); color: var(--pill-yard-t); border-color: var(--pill-yard-b); }
+.note-text { font-size: 11px; color: var(--text-s); margin-top: 8px; line-height: 1.6; font-style: italic; }
+.pill-del { margin-left: 4px; font-size: 11px; opacity: 0; cursor: pointer; font-style: normal; line-height: 1; transition: opacity 0.15s; }
+.pill:hover .pill-del { opacity: 0.6; }
+.pill-del:hover { opacity: 1 !important; }
+.goal-del-btn { background: none; border: none; cursor: pointer; color: var(--text-s); font-size: 14px; padding: 0 4px; opacity: 0; margin-left: 4px; line-height: 1; transition: opacity 0.15s; flex-shrink: 0; }
+.goal-item:hover .goal-del-btn { opacity: 0.5; }
+.goal-del-btn:hover { opacity: 1 !important; color: var(--accent); }
+
+/* Add pill form */
+.add-pill-row { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.add-pill-row input[type=text] { flex: 1; min-width: 120px; padding: 5px 10px; font-size: 12px; border: 1px solid var(--border-m); border-radius: 20px; background: var(--bg-secondary); color: var(--text); font-family: inherit; outline: none; }
+.add-pill-row input[type=text]:focus { border-color: var(--accent); }
+.add-pill-row select { padding: 5px 8px; font-size: 12px; border: 1px solid var(--border-m); border-radius: 20px; background: var(--bg-secondary); color: var(--text); font-family: inherit; outline: none; cursor: pointer; }
+.add-pill-row button { padding: 5px 12px; font-size: 12px; border: 1px solid var(--border-m); border-radius: 20px; background: var(--accent); color: white; cursor: pointer; font-family: inherit; }
+
+/* Phase cards (school/longterm) */
+.phase-card { border: 1px solid var(--border); border-radius: 14px; padding: 1rem 1.25rem; margin-bottom: 1rem; background: var(--bg-primary); }
+.phase-card.highlight { border-color: var(--accent); border-width: 1.5px; }
+.phase-dates { font-size: 11px; font-weight: 600; color: var(--text-s); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
+.phase-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+.phase-sub { font-size: 12px; color: var(--text-s); line-height: 1.7; margin-bottom: 10px; }
+.goal-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.goal-item { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; line-height: 1.5; }
+.goal-check { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--border-m); cursor: pointer; flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; font-size: 10px; transition: background 0.15s; }
+.goal-check.checked { background: var(--check); border-color: var(--check); color: white; }
+.goal-text { flex: 1; }
+.goal-text.checked { opacity: 0.45; text-decoration: line-through; color: var(--text-s); }
+
+/* Timeline */
+.timeline { position: relative; padding-left: 22px; }
+.timeline::before { content: ''; position: absolute; left: 6px; top: 8px; bottom: 8px; width: 1px; background: var(--border-m); }
+.tl-node { position: relative; margin-bottom: 1.25rem; }
+.tl-node::before { content: ''; position: absolute; left: -19px; top: 5px; width: 10px; height: 10px; border-radius: 50%; background: var(--bg-page); border: 2px solid var(--border-m); }
+.tl-node.current::before { background: var(--accent); border-color: var(--accent); }
+.tl-node.future::before { background: var(--bg-primary); border-color: var(--border-m); }
+.tl-node.complete::before { background: var(--green); border-color: var(--green); }
+.tl-year { font-size: 14px; font-weight: 600; color: var(--accent); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.tl-detail { font-size: 12px; color: var(--text-s); line-height: 1.7; }
+.you-badge { font-size: 10px; background: var(--accent); color: white; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+
+/* Callouts */
+.callout { background: var(--bg-secondary); border-left: 2px solid var(--accent); padding: 10px 14px; border-radius: 0 10px 10px 0; font-size: 12px; color: var(--text-s); line-height: 1.7; margin: 1rem 0; }
+.callout.green { border-left-color: var(--green); }
+.callout.amber { border-left-color: var(--amber); }
+
+/* Legend */
+.legend { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+.leg { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-s); }
+.ldot { width: 8px; height: 8px; border-radius: 50%; }
+
+/* Progress ring for halloween */
+.progress-wrap { display: flex; align-items: center; gap: 8px; }
+
+.export-row { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.hdr-btn { font-size: 11px; background: var(--bg-secondary); border: 1px solid var(--border-m); border-radius: 20px; padding: 4px 12px; color: var(--text-s); cursor: pointer; font-family: inherit; }
+.hdr-btn:hover { color: var(--accent); border-color: var(--accent); }
+.import-box { display: none; margin-top: 8px; }
+.import-box textarea { width: 100%; height: 60px; font-size: 11px; font-family: monospace; padding: 6px; border: 1px solid var(--border-m); border-radius: 8px; background: var(--bg-secondary); color: var(--text); resize: none; }
+
+@media(max-width:520px){ .header-top { flex-direction: column; } .stats-bar { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body data-theme="halloween">
+
+<!-- LOGIN GATE -->
+<div id="login-gate" style="position:fixed;inset:0;z-index:9999;background:var(--bg-page);display:flex;align-items:center;justify-content:center;">
+  <div style="background:var(--bg-primary);border:1px solid var(--border);border-radius:14px;padding:2.2rem;max-width:340px;width:90%;box-shadow:var(--shadow);text-align:center;">
+    <div style="font-size:1.5rem;color:var(--accent);margin-bottom:.3rem;">🎃 My Life Roadmap</div>
+    <div style="color:var(--text-s);font-size:.85rem;margin-bottom:1.4rem;">sign in to unlock your roadmap</div>
+    <input id="login-email" type="email" placeholder="email" autocomplete="username"
+      style="width:100%;padding:10px 12px;margin-bottom:8px;background:var(--bg-secondary);border:1px solid var(--border-m);border-radius:8px;color:var(--text);font-family:inherit;font-size:.9rem;">
+    <input id="login-password" type="password" placeholder="password" autocomplete="current-password"
+      style="width:100%;padding:10px 12px;margin-bottom:12px;background:var(--bg-secondary);border:1px solid var(--border-m);border-radius:8px;color:var(--text);font-family:inherit;font-size:.9rem;">
+    <button id="login-btn" onclick="doLogin()" style="width:100%;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:.9rem;">Enter</button>
+    <div id="login-error" style="color:var(--pink);font-size:.78rem;margin-top:10px;min-height:1em;"></div>
+  </div>
+</div>
+
+<div class="app" id="app-layout" style="display:none;">
+
+<div class="header">
+  <div class="header-top">
+    <div>
+      <h1 id="header-title">🎃 My Life Roadmap</h1>
+      <p>Check things off as you go · Edit anything · It saves automatically</p>
+      <div class="save-badge">💾 Auto-saves to this browser</div>
+    </div>
+    <div>
+      <div class="export-row">
+        <button class="hdr-btn" onclick="exportData()">⬇ Export</button>
+        <button class="hdr-btn" onclick="toggleImport()">⬆ Import</button>
+        <button class="hdr-btn" onclick="doLogout()">🚪 Log out</button>
+      </div>
+      <div class="import-box" id="import-box">
+        <textarea id="import-text" placeholder="Paste exported data here..."></textarea>
+        <button class="hdr-btn" style="margin-top:4px" onclick="importData()">Apply import</button>
+      </div>
+    </div>
+  </div>
+  <div class="theme-row">
+    <span class="theme-label">Theme:</span>
+    <button class="theme-btn active" data-theme="halloween" style="background:linear-gradient(135deg,#f97316,#7c2d92)" title="Halloween" onclick="setTheme('halloween')"></button>
+    <button class="theme-btn" data-theme="forest" style="background:linear-gradient(135deg,#2d7a3a,#8bc34a)" title="Forest" onclick="setTheme('forest')"></button>
+    <button class="theme-btn" data-theme="ocean" style="background:linear-gradient(135deg,#0369a1,#06b6d4)" title="Ocean" onclick="setTheme('ocean')"></button>
+    <button class="theme-btn" data-theme="sunset" style="background:linear-gradient(135deg,#f97316,#ec4899)" title="Sunset" onclick="setTheme('sunset')"></button>
+    <button class="theme-btn" data-theme="lavender" style="background:linear-gradient(135deg,#7c3aed,#ec4899)" title="Lavender" onclick="setTheme('lavender')"></button>
+    <button class="theme-btn" data-theme="christmas" style="background:linear-gradient(135deg,#c0392b,#1a7a3a)" title="Christmas" onclick="setTheme('christmas')"></button>
+    <button class="theme-btn" data-theme="fall" style="background:linear-gradient(135deg,#b45309,#c0392b)" title="Fall" onclick="setTheme('fall')"></button>
+  </div>
+</div>
+
+<div class="stats-bar" id="stats-bar"></div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('summer')">☀️ Summer 2026</button>
+  <button class="tab" onclick="switchTab('school')">📚 School Year</button>
+  <button class="tab" onclick="switchTab('longterm')">🗺️ Long-term</button>
+</div>
+
+<div class="content">
+
+<!-- SUMMER -->
+<div id="panel-summer" class="panel active">
+  <div class="legend">
+    <div class="leg"><div class="ldot" style="background:var(--pill-home-t)"></div>Home</div>
+    <div class="leg"><div class="ldot" style="background:var(--pill-health-t)"></div>Health</div>
+    <div class="leg"><div class="ldot" style="background:var(--pill-study-t)"></div>Study</div>
+    <div class="leg"><div class="ldot" style="background:var(--pill-family-t)"></div>Family</div>
+    <div class="leg"><div class="ldot" style="background:var(--pill-travel-t)"></div>Travel</div>
+    <div class="leg"><div class="ldot" style="background:var(--pill-finance-t)"></div>Finances</div>
+    <div class="leg"><div class="ldot" style="background:var(--pill-yard-t)"></div>Backyard</div>
+  </div>
+  <div class="callout">Summer is your runway. The habits you build here carry you through your final two semesters. Protect it intentionally.</div>
+  <div id="summer-months"></div>
+</div>
+
+<!-- SCHOOL YEAR -->
+<div id="panel-school" class="panel">
+  <div class="callout">Your final two semesters. The goal isn't just to get through them — it's to genuinely enjoy them. You've earned the right to love what you're learning without guilt.</div>
+  <div id="school-content"></div>
+</div>
+
+<!-- LONG TERM -->
+<div id="panel-longterm" class="panel">
+  <div class="callout">Everything connects. The decisions you make this summer ripple all the way to 2029 and beyond. The plan is real. The numbers work.</div>
+  <div id="longterm-content"></div>
+</div>
+
+</div>
+</div>
+
+<script>
+const STORE = 'roadmap_v2';
+
+const THEMES = {
+  halloween: { emoji: '🎃', title: '🎃 My Life Roadmap' },
+  forest:    { emoji: '🌲', title: '🌲 My Life Roadmap' },
+  ocean:     { emoji: '🌊', title: '🌊 My Life Roadmap' },
+  sunset:    { emoji: '🌅', title: '🌅 My Life Roadmap' },
+  lavender:  { emoji: '💜', title: '💜 My Life Roadmap' },
+  christmas: { emoji: '🎄', title: '🎄 My Life Roadmap' },
+  fall:      { emoji: '🍂', title: '🍂 My Life Roadmap' }
+};
+
+const CAT = ['home','health','study','family','travel','finance','yard'];
+
+// ── Default data ────────────────────────────────────────────────────────
+const DEFAULT = {
+  theme: 'halloween',
+  pills: {}, // keyed by "month-week-index" -> checked bool
+  deletedPills: {}, // keyed by pill key -> true if default pill deleted
+  goals: {}, // keyed by "phase-index" -> checked bool
+  deletedGoals: {}, // keyed by goal key -> true if default goal deleted
+  customPills: {}, // keyed by "month-week" -> [{text,cat}]
+  customGoals: {}, // keyed by "phase" -> [{text}]
+};
+
+const SUMMER_DATA = [
+  {
+    month: 'May — Decompress & launch',
+    color: '#378ADD',
+    weeks: [
+      {
+        label: 'Weeks 1–2 · Mid-May',
+        items: [
+          {text:'Car registration', cat:'finance'},
+          {text:'Start declutter — room by room', cat:'home'},
+          {text:'Start pilates — 2x/week', cat:'health'},
+          {text:'GLP-1: talk to primary doctor', cat:'health'},
+        ],
+        note: "Don't try to do everything at once. Pick one room, finish it, move on. Momentum matters more than speed."
+      },
+      {
+        label: 'Weeks 3–4 · Late May',
+        items: [
+          {text:'Facebook Marketplace — list furniture', cat:'home'},
+          {text:'Donation runs as you go', cat:'home'},
+          {text:'Backyard — leaf removal first', cat:'yard'},
+          {text:'Add cardio on nice weather days', cat:'health'},
+          {text:'Math review — 30 min/day', cat:'study'},
+        ],
+        note: 'The backyard feels overwhelming but leaf removal alone will make it look 80% better. Start there before any landscaping decisions.'
+      }
+    ]
+  },
+  {
+    month: "June — Son's birthday & San Francisco",
+    color: '#D4537E',
+    weeks: [
+      {
+        label: 'Weeks 1–2 · Early June',
+        items: [
+          {text:'Deep clean — whole house', cat:'home'},
+          {text:'Backyard phase 2 — weeding, edges', cat:'yard'},
+          {text:'Health routine locked in', cat:'health'},
+          {text:'Chemistry review — 30 min/day', cat:'study'},
+          {text:"Son's birthday — plan something special", cat:'family'},
+        ],
+        note: ''
+      },
+      {
+        label: "Week 3 · Mid-June (son turns 14)",
+        items: [
+          {text:'Mom visits — son stays with her', cat:'family'},
+          {text:'San Francisco trip 🌁', cat:'travel'},
+          {text:'See grandma — stay free', cat:'family'},
+        ],
+        note: "Flights are your main cost. Hotel covered by work, accommodation after covered by grandma. This trip is basically free — lean into it and rest."
+      },
+      {
+        label: 'Week 4 · Late June',
+        items: [
+          {text:'Reassess what is left — make a list', cat:'home'},
+          {text:'Backyard — grass/landscaping decision', cat:'yard'},
+          {text:'Biology review begins', cat:'study'},
+          {text:'Son — explore outdoors, keep him busy', cat:'family'},
+        ],
+        note: ''
+      }
+    ]
+  },
+  {
+    month: 'July — Deep work month',
+    color: '#1D9E75',
+    weeks: [
+      {
+        label: 'Weeks 1–2 · Early July',
+        items: [
+          {text:'Physics review — 45 min/day', cat:'study'},
+          {text:'Pilates 3x/week + cardio 2x/week', cat:'health'},
+          {text:'Backyard — plant grass/sod if budget allows', cat:'yard'},
+          {text:'Son — nature outings, hikes, exploring', cat:'family'},
+          {text:'Pipe fix — get quotes, book repair', cat:'finance'},
+        ],
+        note: 'July is your most open month. No known travel, son is home. Use it for the deepest study sessions and biggest house/yard pushes.'
+      },
+      {
+        label: 'Weeks 3–4 · Late July',
+        items: [
+          {text:'Full review cycle — all four subjects', cat:'study'},
+          {text:'House fully organized by end of July', cat:'home'},
+          {text:'Clean eating fully established', cat:'health'},
+          {text:'Update budget — check debt progress', cat:'finance'},
+          {text:'Family time — nature, cooking together', cat:'family'},
+        ],
+        note: 'By end of July you want the house done, the yard looking good, and your study habit locked in. August is for consolidating, not catching up.'
+      }
+    ]
+  },
+  {
+    month: 'August — Pre-semester wind-down',
+    color: '#7F77DD',
+    weeks: [
+      {
+        label: 'Weeks 1–2 · Early August',
+        items: [
+          {text:'Course prep — review syllabi, get books early', cat:'study'},
+          {text:'Maintain health routine — do not let it slip', cat:'health'},
+          {text:'Final house touches — anything left', cat:'home'},
+          {text:'Quality time before school starts back', cat:'family'},
+        ],
+        note: ''
+      },
+      {
+        label: 'Weeks 3–4 · Late August (school starts)',
+        items: [
+          {text:'Fall semester begins', cat:'study'},
+          {text:'Transition routine to school schedule', cat:'health'},
+          {text:'Son starts sophomore year', cat:'family'},
+        ],
+        note: 'No trips during the semester. This is the rule you set for yourself — hold it.'
+      }
+    ]
+  }
+];
+
+const SCHOOL_DATA = [
+  {
+    id: 'fall26',
+    dates: 'Fall 2026 · Aug – Dec',
+    title: 'Your penultimate semester',
+    sub: "You've done the hardest work of building habits this summer. Now it's about keeping them through a demanding schedule.",
+    highlight: true,
+    goals: [
+      'Go to every class — engagement starts with showing up',
+      'Introduce yourself to at least one professor early — ask about their research',
+      'No trips scheduled mid-semester — you already committed to this',
+      'Pilates or gym at least 2x/week — protect this no matter how busy it gets',
+      'Cook at home 4–5 nights/week — health and savings together',
+      'Check in on budget monthly with fiancé — make it a date night',
+      'Start thinking about senior year research or internship opportunities',
+      'Allow yourself to be curious — ask questions, sit with the material',
+    ]
+  },
+  {
+    id: 'spring27',
+    dates: 'Spring 2027 · Jan – May',
+    title: 'Your final semester',
+    sub: "This is it. Savor it. You will not be a student again for a while — possibly not in this way ever again.",
+    highlight: true,
+    goals: [
+      'Connect with Career Services at CU — forensic science and ecology job fairs, federal hiring pipelines',
+      'Start applying for jobs January/February — federal positions take time',
+      'Look into USGS, Colorado Parks & Wildlife, Denver/Boulder city roles, local crime labs, US Fish & Wildlife',
+      'Talk to professors about letters of recommendation before April',
+      'No mid-semester trips — same rule, same reason',
+      'Finalize Boulder move plan with fiancé — research neighborhoods, costs, timeline',
+      'Graduate with both degrees in May 2027 🎓',
+    ]
+  }
+];
+
+const LONGTERM_DATA = [
+  { id:'now', type:'current', year:'Now — Summer 2026', badge:'You are here', detail:"Build health habits. Declutter and organize the house. Study foundations. San Francisco trip. Backyard. Car registration. Fix pipe. Son turns 14. Execute the plan." },
+  { id:'school', type:'current', year:'Fall 2026 — Spring 2027 · Final two semesters', badge:'', detail:"Go to class. Engage. Enjoy it. Pay down the lien and mortgage aggressively. Keep health consistent. No mid-semester trips. Start job hunting in Spring 2027. Fiancé likely at ~$8,000+/month with annual raises." },
+  { id:'grad', type:'future', year:'May 2027 · Graduation', badge:'', detail:"You graduate with a B.S. in Biochemistry and a B.S. in Ecology & Evolutionary Studies from CU Boulder. You start working — target $40,000+ to start. Two incomes for the first time. Financial picture changes dramatically." },
+  { id:'boulder', type:'future', year:'Summer 2027 · The Boulder move', badge:'', detail:"Westminster rents for ~$3,200/mo. Mortgage is $3,650 — roughly $450/month gap, manageable on two incomes. You and your fiancé move to Boulder. Son starts junior year with his old friends. Fiancé's creative energy returns. ~$11,000/month combined income, ~$6,000/month surplus." },
+  { id:'boulder2', type:'future', year:'2027–2029 · The Boulder years', badge:'', detail:"Both working. Son finishing high school. Westminster equity growing. Lien paid off or nearly so. Use this window to travel and explore PNW — Oregon, Washington, northern California. Fiancé building his creative side project. You accumulating field and lab experience. Consider Master's in forensic psychology when the time feels right." },
+  { id:'songrad', type:'future', year:'May 2029 · Son graduates high school', badge:'', detail:"The big choice moment. Does he come with you to the PNW, or stay in Colorado for college? Sell Westminster — equity funds the next chapter. Lien paid off, maximizing your proceeds. US Fish & Wildlife Forensics Lab in Ashland, Oregon is worth keeping on your radar." },
+  { id:'pnw', type:'future', year:'2029+ · PNW or beyond', badge:'', detail:"Move to Oregon, Washington, or northern California. You're established in your career. Fiancé has hopefully built his creative income stream. You're both making real money. The family lands somewhere with more rain, lower elevation, and all the things that light you up." },
+];
+
+// ── State ───────────────────────────────────────────────────────────────
+let state = JSON.parse(JSON.stringify(DEFAULT));
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORE);
+    if (raw) {
+      const s = JSON.parse(raw);
+      state = Object.assign({}, DEFAULT, s);
+      if (!state.deletedPills) state.deletedPills = {};
+      if (!state.deletedGoals) state.deletedGoals = {};
+    }
+  } catch(e) {}
+}
+
+function saveState() {
+  try { localStorage.setItem(STORE, JSON.stringify(state)); } catch(e) {}
+  if (window.fb && window.fb.auth.currentUser) {
+    window.fb.saveDoc('users/' + window.fb.auth.currentUser.uid + '/data/roadmap', state)
+      .catch(e => console.warn('Cloud save failed:', e));
+  }
+}
+
+async function syncFromCloud() {
+  if (!(window.fb && window.fb.auth.currentUser)) return;
+  const path = 'users/' + window.fb.auth.currentUser.uid + '/data/roadmap';
+  try {
+    const cloudData = await window.fb.loadDoc(path);
+    if (cloudData) {
+      state = Object.assign({}, DEFAULT, cloudData);
+      if (!state.deletedPills) state.deletedPills = {};
+      if (!state.deletedGoals) state.deletedGoals = {};
+      try { localStorage.setItem(STORE, JSON.stringify(state)); } catch(e) {}
+    } else {
+      await window.fb.saveDoc(path, state);
+    }
+  } catch(e) { console.warn('Cloud sync failed:', e); }
+}
+
+function whenFirebaseReady(cb) {
+  if (window.fb) cb(); else window.addEventListener('firebase-ready', cb, {once:true});
+}
+
+function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const errEl = document.getElementById('login-error');
+  errEl.textContent = '';
+  if (!email || !password) { errEl.textContent = 'enter both email and password'; return; }
+  window.fb.signIn(email, password).catch(e => {
+    errEl.textContent = 'login failed — check your email and password';
+    console.warn(e);
+  });
+}
+
+function doLogout() {
+  if (window.fb) window.fb.signOut();
+}
+
+// ── Theme ───────────────────────────────────────────────────────────────
+function setTheme(t) {
+  document.body.setAttribute('data-theme', t);
+  document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.theme === t);
+  });
+  const ti = document.getElementById('header-title');
+  if (ti) ti.textContent = THEMES[t]?.title || '🗺️ My Life Roadmap';
+  state.theme = t;
+  saveState();
+}
+
+// ── Pill key ────────────────────────────────────────────────────────────
+function pillKey(mi, wi, pi) { return `${mi}-${wi}-${pi}`; }
+function goalKey(phase, gi) { return `${phase}-${gi}`; }
+
+// ── Toggle ──────────────────────────────────────────────────────────────
+function togglePill(key, el) {
+  state.pills[key] = !state.pills[key];
+  saveState();
+  el.classList.toggle('checked', !!state.pills[key]);
+  const ck = el.querySelector('.pill-check');
+  if (ck) ck.textContent = state.pills[key] ? '✓' : '';
+  updateStats();
+}
+
+function toggleGoal(key, checkEl, textEl) {
+  state.goals[key] = !state.goals[key];
+  saveState();
+  checkEl.classList.toggle('checked', !!state.goals[key]);
+  checkEl.textContent = state.goals[key] ? '✓' : '';
+  textEl.classList.toggle('checked', !!state.goals[key]);
+  updateStats();
+}
+
+// ── Render summer ───────────────────────────────────────────────────────
+function renderSummer() {
+  const container = document.getElementById('summer-months');
+  if (!container) return;
+  container.innerHTML = '';
+  SUMMER_DATA.forEach((month, mi) => {
+    const section = document.createElement('div');
+    section.className = 'month-section';
+    const header = document.createElement('div');
+    header.className = 'month-header';
+    header.innerHTML = `<div class="month-title"><div class="month-dot" style="background:${month.color}"></div>${month.month}</div>
+      <button class="add-item-btn" onclick="showAddForm('summer-add-${mi}')">+ Add item</button>`;
+    section.appendChild(header);
+
+    month.weeks.forEach((week, wi) => {
+      const wb = document.createElement('div');
+      wb.className = 'week-block';
+      wb.innerHTML = `<div class="week-label">${week.label}</div>`;
+      const row = document.createElement('div');
+      row.className = 'pill-row';
+
+      // Default items
+      week.items.forEach((item, pi) => {
+        const key = pillKey(mi, wi, pi);
+        const checked = !!state.pills[key];
+        const deleted = !!state.deletedPills[key];
+        if (deleted) return;
+        const p = document.createElement('span');
+        p.className = `pill pill-${item.cat}${checked ? ' checked' : ''}`;
+        p.innerHTML = `<span class="pill-check">${checked ? '✓' : ''}</span>${item.text}<span class="pill-del" onclick="event.stopPropagation();deleteDefaultPill('${key}')" title="Delete">×</span>`;
+        p.onclick = () => togglePill(key, p);
+        row.appendChild(p);
+      });
+
+      // Custom items
+      const customKey = `${mi}-${wi}`;
+      const customs = state.customPills[customKey] || [];
+      customs.forEach((item, ci) => {
+        const key = pillKey(mi, wi, `c${ci}`);
+        const checked = !!state.pills[key];
+        const p = document.createElement('span');
+        p.className = `pill pill-${item.cat}${checked ? ' checked' : ''}`;
+        p.innerHTML = `<span class="pill-check">${checked ? '✓' : ''}</span>${item.text}<span class="pill-del" onclick="event.stopPropagation();removeCustomPill('${customKey}',${ci})" title="Delete">×</span>`;
+        p.onclick = (e) => { if(!e.target.classList.contains('pill-del')) togglePill(key, p); };
+        row.appendChild(p);
+      });
+
+      wb.appendChild(row);
+      if (week.note) {
+        const note = document.createElement('div');
+        note.className = 'note-text';
+        note.textContent = week.note;
+        wb.appendChild(note);
+      }
+
+      // Add form
+      const formDiv = document.createElement('div');
+      formDiv.id = `summer-add-${mi}-${wi}`;
+      formDiv.style.display = 'none';
+      formDiv.innerHTML = `<div class="add-pill-row">
+        <input type="text" placeholder="New item..." id="pill-text-${mi}-${wi}">
+        <select id="pill-cat-${mi}-${wi}">${CAT.map(c=>`<option value="${c}">${c}</option>`).join('')}</select>
+        <button onclick="addCustomPill(${mi},${wi})">Add</button>
+      </div>`;
+      wb.appendChild(formDiv);
+      section.appendChild(wb);
+    });
+
+    // Month-level add form
+    const mForm = document.createElement('div');
+    mForm.id = `summer-add-${mi}`;
+    mForm.style.display = 'none';
+    mForm.innerHTML = `<div class="add-pill-row" style="margin:8px 0">
+      <input type="text" placeholder="New item for this month..." id="mpill-text-${mi}">
+      <select id="mpill-cat-${mi}">${CAT.map(c=>`<option value="${c}">${c}</option>`).join('')}</select>
+      <button onclick="addCustomPill(${mi},0,'month')">Add to first week</button>
+    </div>`;
+    section.appendChild(mForm);
+    container.appendChild(section);
+  });
+}
+
+function showAddForm(id) {
+  const el = document.getElementById(id);
+  if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+function addCustomPill(mi, wi) {
+  const textEl = document.getElementById(`pill-text-${mi}-${wi}`);
+  const catEl = document.getElementById(`pill-cat-${mi}-${wi}`);
+  if (!textEl || !textEl.value.trim()) return;
+  const key = `${mi}-${wi}`;
+  if (!state.customPills[key]) state.customPills[key] = [];
+  state.customPills[key].push({ text: textEl.value.trim(), cat: catEl.value });
+  textEl.value = '';
+  saveState();
+  renderSummer();
+  updateStats();
+}
+
+function removeCustomPill(key, ci) {
+  if (!state.customPills[key]) return;
+  state.customPills[key].splice(ci, 1);
+  saveState();
+  renderSummer();
+  updateStats();
+}
+
+function deleteDefaultPill(key) {
+  if (!confirm('Remove this item? You can restore it by importing a backup.')) return;
+  state.deletedPills[key] = true;
+  saveState();
+  renderSummer();
+  updateStats();
+}
+
+// ── Render school ───────────────────────────────────────────────────────
+function renderSchool() {
+  const container = document.getElementById('school-content');
+  if (!container) return;
+  container.innerHTML = '';
+
+  SCHOOL_DATA.forEach(phase => {
+    const card = document.createElement('div');
+    card.className = `phase-card${phase.highlight ? ' highlight' : ''}`;
+    card.innerHTML = `<div class="phase-dates">${phase.dates}</div><div class="phase-title">${phase.title}</div><div class="phase-sub">${phase.sub}</div>`;
+
+    const ul = document.createElement('ul');
+    ul.className = 'goal-list';
+
+    phase.goals.forEach((goal, gi) => {
+      const key = goalKey(phase.id, gi);
+      if (state.deletedGoals && state.deletedGoals[key]) return;
+      const checked = !!state.goals[key];
+      const li = document.createElement('li');
+      li.className = 'goal-item';
+      const ck = document.createElement('div');
+      ck.className = `goal-check${checked ? ' checked' : ''}`;
+      ck.textContent = checked ? '✓' : '';
+      const tx = document.createElement('span');
+      tx.className = `goal-text${checked ? ' checked' : ''}`;
+      tx.textContent = goal;
+      const del = document.createElement('button');
+      del.className = 'goal-del-btn';
+      del.textContent = '×';
+      del.title = 'Delete';
+      del.onclick = () => { if(confirm('Remove this goal?')){ if(!state.deletedGoals)state.deletedGoals={};state.deletedGoals[key]=true;saveState();renderSchool();updateStats(); } };
+      ck.onclick = () => toggleGoal(key, ck, tx);
+      tx.onclick = () => toggleGoal(key, ck, tx);
+      li.appendChild(ck); li.appendChild(tx); li.appendChild(del);
+      ul.appendChild(li);
+    });
+
+    // Custom goals
+    const customs = state.customGoals[phase.id] || [];
+    customs.forEach((goal, ci) => {
+      const key = goalKey(phase.id, `c${ci}`);
+      const checked = !!state.goals[key];
+      const li = document.createElement('li');
+      li.className = 'goal-item';
+      const ck = document.createElement('div');
+      ck.className = `goal-check${checked ? ' checked' : ''}`;
+      ck.textContent = checked ? '✓' : '';
+      const tx = document.createElement('span');
+      tx.className = `goal-text${checked ? ' checked' : ''}`;
+      tx.textContent = goal;
+      const del = document.createElement('button');
+      del.className = 'goal-del-btn';
+      del.textContent = '×';
+      del.title = 'Delete';
+      del.onclick = () => removeCustomGoal(phase.id, ci);
+      ck.onclick = () => toggleGoal(key, ck, tx);
+      li.appendChild(ck); li.appendChild(tx); li.appendChild(del);
+      ul.appendChild(li);
+    });
+
+    card.appendChild(ul);
+
+    // Add form
+    const addForm = document.createElement('div');
+    addForm.style.marginTop = '10px';
+    addForm.innerHTML = `<div class="add-pill-row">
+      <input type="text" placeholder="Add a goal..." id="goal-text-${phase.id}">
+      <button onclick="addCustomGoal('${phase.id}')">Add</button>
+    </div>`;
+    card.appendChild(addForm);
+    container.appendChild(card);
+  });
+
+  const callout = document.createElement('div');
+  callout.className = 'callout green';
+  callout.textContent = "On the master's in forensic psychology: get a few years of work experience first. The degree will mean more, and you'll know exactly which direction to point it.";
+  container.appendChild(callout);
+}
+
+function addCustomGoal(phaseId) {
+  const el = document.getElementById(`goal-text-${phaseId}`);
+  if (!el || !el.value.trim()) return;
+  if (!state.customGoals[phaseId]) state.customGoals[phaseId] = [];
+  state.customGoals[phaseId].push(el.value.trim());
+  el.value = '';
+  saveState();
+  renderSchool();
+  updateStats();
+}
+
+function removeCustomGoal(phaseId, ci) {
+  if (!state.customGoals[phaseId]) return;
+  state.customGoals[phaseId].splice(ci, 1);
+  saveState();
+  renderSchool();
+  updateStats();
+}
+
+// ── Render longterm ──────────────────────────────────────────────────────
+function renderLongterm() {
+  const container = document.getElementById('longterm-content');
+  if (!container) return;
+  container.innerHTML = '';
+  const tl = document.createElement('div');
+  tl.className = 'timeline';
+  LONGTERM_DATA.forEach(node => {
+    const div = document.createElement('div');
+    div.className = `tl-node ${node.type}`;
+    div.innerHTML = `<div class="tl-year">${node.year}${node.badge ? `<span class="you-badge">${node.badge}</span>` : ''}</div><div class="tl-detail">${node.detail}</div>`;
+    tl.appendChild(div);
+  });
+  container.appendChild(tl);
+  const callout = document.createElement('div');
+  callout.className = 'callout green';
+  callout.style.marginTop = '1.5rem';
+  callout.textContent = 'The through-line: you are not waiting for your life to start. You are living it right now, building it deliberately, one summer at a time. The plan is real. The numbers work. You just have to execute.';
+  container.appendChild(callout);
+}
+
+// ── Stats ───────────────────────────────────────────────────────────────
+function countItems() {
+  let total = 0, done = 0;
+  SUMMER_DATA.forEach((month, mi) => {
+    month.weeks.forEach((week, wi) => {
+      week.items.forEach((_, pi) => {
+        const key = pillKey(mi, wi, pi);
+        if (state.deletedPills[key]) return;
+        total++;
+        if (state.pills[key]) done++;
+      });
+      (state.customPills[`${mi}-${wi}`] || []).forEach((_, ci) => {
+        total++;
+        if (state.pills[pillKey(mi, wi, `c${ci}`)]) done++;
+      });
+    });
+  });
+  SCHOOL_DATA.forEach(phase => {
+    phase.goals.forEach((_, gi) => {
+      const key = goalKey(phase.id, gi);
+      if (state.deletedGoals && state.deletedGoals[key]) return;
+      total++;
+      if (state.goals[key]) done++;
+    });
+    (state.customGoals[phase.id] || []).forEach((_, ci) => {
+      total++;
+      if (state.goals[goalKey(phase.id, `c${ci}`)]) done++;
+    });
+  });
+  return { total, done };
+}
+
+function updateStats() {
+  const { total, done } = countItems();
+  const pct = total > 0 ? Math.round(done / total * 100) : 0;
+  const el = document.getElementById('stats-bar');
+  if (!el) return;
+  el.innerHTML = [
+    { label: 'Completed', val: done },
+    { label: 'Remaining', val: total - done },
+    { label: 'Progress', val: pct + '%' },
+    { label: 'Total items', val: total }
+  ].map(s => `<div class="stat"><div class="stat-val">${s.val}</div><div class="stat-label">${s.label}</div></div>`).join('');
+}
+
+// ── Tab switching ────────────────────────────────────────────────────────
+function switchTab(name) {
+  ['summer','school','longterm'].forEach(t => {
+    document.querySelector(`[onclick="switchTab('${t}')"]`)?.classList.toggle('active', t === name);
+    const p = document.getElementById('panel-' + t);
+    if (p) p.classList.toggle('active', t === name);
+  });
+}
+
+// ── Export / Import ──────────────────────────────────────────────────────
+function exportData() {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'my_roadmap_backup.json'; a.click();
+  URL.revokeObjectURL(url);
+}
+function toggleImport() {
+  const el = document.getElementById('import-box');
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+function importData() {
+  const text = document.getElementById('import-text')?.value?.trim();
+  if (!text) return;
+  try {
+    state = Object.assign({}, DEFAULT, JSON.parse(text));
+    saveState();
+    init();
+    document.getElementById('import-box').style.display = 'none';
+  } catch(e) { alert('Could not read that data — paste the full exported text.'); }
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────
+function init() {
+  setTheme(state.theme || 'halloween');
+  renderSummer();
+  renderSchool();
+  renderLongterm();
+  updateStats();
+}
+
+loadState(); // instant local cache so nothing crashes before cloud data arrives
+
+whenFirebaseReady(function() {
+  window.fb.onAuthChange(async function(user) {
+    const gate = document.getElementById('login-gate');
+    const layout = document.getElementById('app-layout');
+    if (user) {
+      await syncFromCloud();
+      gate.style.display = 'none';
+      layout.style.display = '';
+      init();
+    } else {
+      gate.style.display = 'flex';
+      layout.style.display = 'none';
+    }
+  });
+});
+</script>
+</body>
+</html>
